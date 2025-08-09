@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEIN eduroam Project - Connecting Asia's Education Networks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #9A2AA0;
+            --secondary: #DA3FA3;
+            --body: #FCF5EC;
+            --text: #1D1D1B;
+            --secondary-dark: #4E245C;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--body);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--secondary-dark));
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(154, 42, 160, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: var(--body);
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--body);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .mobile-menu span {
+            width: 25px;
+            height: 3px;
+            background: var(--white);
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 2rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: slideInLeft 1s ease 0.3s both;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+            animation: slideInRight 1s ease 0.6s both;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            animation: fadeIn 1s ease 0.9s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            transition: left 0.3s ease;
+        }
+
+        .cta-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-button:hover::before {
+            left: 0;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(154, 42, 160, 0.3);
+        }
+
+        /* Floating elements */
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .floating-element {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--secondary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-element:nth-child(2) { top: 60%; left: 80%; animation-delay: 2s; }
+        .floating-element:nth-child(3) { top: 30%; left: 70%; animation-delay: 4s; }
+        .floating-element:nth-child(4) { top: 80%; left: 20%; animation-delay: 1s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Sections */
+        .section {
+            padding: 5rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--primary);
+            position: relative;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+        }
+
+        /* Country Grid */
+        .country-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .country-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .country-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            transition: left 0.3s ease;
+        }
+
+        .country-card:hover::before {
+            left: 0;
+        }
+
+        .country-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(154, 42, 160, 0.2);
+        }
+
+        .country-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        /* Statistics */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text);
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 3rem auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+            width: 50%;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+            padding-right: 30px;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+            padding-left: 30px;
+        }
+
+        .timeline-content {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid var(--white);
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content::after {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border-right: 8px solid var(--white);
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--secondary);
+            border-radius: 50%;
+            top: 20px;
+            z-index: 2;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-dot {
+            right: -10px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot {
+            left: -10px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-dark);
+            color: var(--white);
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 5rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .partner-logos {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .partner-logo {
+            background: var(--white);
+            padding: 1rem;
+            border-radius: 10px;
+            color: var(--primary);
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .partner-logo:hover {
+            transform: scale(1.1);
+            background: var(--body);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                width: 100%;
+                left: 0 !important;
+                padding-left: 50px !important;
+                padding-right: 0 !important;
+            }
+
+            .timeline-dot {
+                left: 10px !important;
+                right: auto !important;
+            }
+
+            .timeline-content::after {
+                left: -8px !important;
+                right: auto !important;
+                border-right: 8px solid var(--white) !important;
+                border-left: none !important;
+            }
+
+            .country-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 0 1rem;
+            }
+
+            .section {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">TEIN eduroam</a>
+            <ul class="nav-menu">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#countries">Countries</a></li>
+                <li><a href="#activities">Activities</a></li>
+                <li><a href="#outcomes">Outcomes</a></li>
+                <li><a href="#partners">Partners</a></li>
+            </ul>
+            <div class="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="floating-elements">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
+        <div class="hero-content">
+            <h1>Connecting Asia's Education Networks</h1>
+            <p>Deploying secure, federated Wi-Fi access across eight developing Asian countries through the TEIN eduroam Project</p>
+            <a href="#overview" class="cta-button">
+                <span>Explore the Journey</span>
+            </a>
+        </div>
+    </section>
+
+    <section id="overview" class="section fade-in">
+        <h2>Project Overview</h2>
+        <p style="text-align: center; font-size: 1.2rem; max-width: 800px; margin: 0 auto; opacity: 0.8;">
+            The TEIN eduroam Project successfully deployed secure, federated Wi-Fi access in eight developing Asian countries, transforming educational connectivity and empowering local National Research and Education Networks to operate as National Roaming Operators.
+        </p>
+        
+        <div class="stats-grid">
+            <div class="stat-card fade-in">
+                <span class="stat-number">24</span>
+                <span class="stat-label">Institutions Connected</span>
+            </div>
+            <div class="stat-card fade-in">
+                <span class="stat-number">8</span>
+                <span class="stat-label">Countries Involved</span>
+            </div>
+            <div class="stat-card fade-in">
+                <span class="stat-number">50+</span>
+                <span class="stat-label">Professionals Trained</span>
+            </div>
+            <div class="stat-card fade-in">
+                <span class="stat-number">6</span>
+                <span class="stat-label">Partner Organizations</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="countries" class="section fade-in">
+        <h2>Participating Countries</h2>
+        <div class="country-grid">
+            <div class="country-card fade-in">
+                <h3>🇦🇫 Afghanistan</h3>
+                <p>Building foundational eduroam infrastructure to connect educational institutions across the country.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>🇧🇩 Bangladesh</h3>
+                <p>Empowering universities and research centers with secure wireless access through local NREN capabilities.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>🇧🇹 Bhutan</h3>
+                <p>Enhancing digital learning infrastructure in the Land of the Thunder Dragon.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>🇰🇭 Cambodia</h3>
+                <p>Strengthening educational connectivity and fostering academic collaboration.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>🇮🇩 Indonesia</h3>
+                <p>Expanding secure Wi-Fi access across the archipelago's educational landscape.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>🇱🇦 Laos</h3>
+                <p>Building capacity for identity federation and secure network deployment.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>🇳🇵 Nepal</h3>
+                <p>Connecting mountain communities through advanced educational networking.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>🇻🇳 Vietnam</h3>
+                <p>Implementing cutting-edge wireless security across academic institutions.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="activities" class="section fade-in">
+        <h2>Project Timeline</h2>
+        <div class="timeline">
+            <div class="timeline-item fade-in">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>July 2018</h3>
+                    <h4>Video Trainings Launch</h4>
+                    <p>Four comprehensive video sessions introduced eduroam architecture, NRO responsibilities, and server configurations to participants across all countries.</p>
+                </div>
+            </div>
+            <div class="timeline-item fade-in">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>August 2018</h3>
+                    <h4>APAN46 Workshop</h4>
+                    <p>Major in-person and remote workshop held in New Zealand with 30+ attendees from 8 countries, covering deployment using Docker and monitoring systems.</p>
+                </div>
+            </div>
+            <div class="timeline-item fade-in">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>Q3-Q4 2018</h3>
+                    <h4>Local Training Cascade</h4>
+                    <p>Institutional workshops conducted to cascade knowledge from APAN46 to home-country institutions and build local expertise.</p>
+                </div>
+            </div>
+            <div class="timeline-item fade-in">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>2018-2019</h3>
+                    <h4>Infrastructure Deployment</h4>
+                    <p>Server and WAP procurement, Docker-based deployment tools development, and establishment of country-specific eduroam portals.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="outcomes" class="section fade-in">
+        <h2>Key Achievements</h2>
+        <div class="country-grid">
+            <div class="country-card fade-in">
+                <h3>🌐 Regional Coverage</h3>
+                <p>Successfully established eduroam operations in 24 institutions across 8 countries, providing secure Wi-Fi access in previously underserved regions.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>🔐 Local Autonomy</h3>
+                <p>NRENs gained independence by managing their own eduroam authentication systems and policies as National Roaming Operators.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>🎓 Capacity Building</h3>
+                <p>Over 50 professionals trained in identity federation and wireless security, enhancing institutional capabilities.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>🛠️ Open Source Tools</h3>
+                <p>Developed reusable Docker-based deployment and monitoring tools, shared openly for broader eduroam adoption.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>🤝 Regional Cooperation</h3>
+                <p>Strengthened cross-border NREN collaboration through joint training, documentation, and community building.</p>
+            </div>
+            <div class="country-card fade-in">
+                <h3>📚 Knowledge Resources</h3>
+                <p>Comprehensive documentation and country-specific portals established to support ongoing operations and expansion.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="partners" class="section fade-in">
+        <h2>Partner Organizations</h2>
+        <p style="text-align: center; font-size: 1.2rem; margin-bottom: 3rem; opacity: 0.8;">
+            Collaboration with leading research and education networks made this project possible
+        </p>
+        <div class="partner-logos">
+            <div class="partner-logo">AARNet</div>
+            <div class="partner-logo">TEIN*CC</div>
+            <div class="partner-logo">JNU Korea</div>
+            <div class="partner-logo">KISTI</div>
+            <div class="partner-logo">REANNZ</div>
+            <div class="partner-logo">SingAREN</div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <h3>TEIN eduroam Project</h3>
+            <p>WP4 • 1st Call • Connecting Asia's Educational Networks</p>
+            <div style="margin-top: 2rem;">
+                <p style="opacity: 0.7;">Supporting SDG 4: Quality Education • SDG 9: Industry, Innovation & Infrastructure • SDG 17: Partnerships for the Goals</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Counter animation for statistics
+        const animateCounters = () => {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = parseInt(counter.textContent.replace('+', ''));
+                const duration = 2000;
+                const step = target / (duration / 16);
+                let current = 0;
+                
+                const updateCounter = () => {
+                    if (current < target) {
+                        current += step;
+                        const displayValue = Math.floor(current);
+                        counter.textContent = displayValue > target ? 
+                            (counter.textContent.includes('+') ? target + '+' : target) : 
+                            (counter.textContent.includes('+') ? displayValue + '+' : displayValue);
+                        requestAnimationFrame(updateCounter);
+                    }
+                };
+                
+                updateCounter();
+            });
+        };
+
+        // Trigger counter animation when stats section is visible
+        const statsSection = document.querySelector('.stats-grid');
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+
+        // Mobile menu toggle (basic implementation)
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const navMenu = document.querySelector('.nav-menu');
+
+        mobileMenu.addEventListener('click', () => {
+            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // Parallax effect for floating elements
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelectorAll('.floating-element');
+            const speed = 0.5;
+
+            parallax.forEach((element, index) => {
+                const yPos = -(scrolled * speed * (index + 1) * 0.1);
+                element.style.transform = `translateY(${yPos}px) rotate(${scrolled * 0.1}deg)`;
+            });
+        });
+
+        // Dynamic navbar background on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(154, 42, 160, 0.98)';
+            } else {
+                nav.style.background = 'rgba(154, 42, 160, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>
